@@ -129,28 +129,23 @@ pub type RGB = (u8, u8, u8);
 
 impl From<Color> for RGB {
     fn from(color: Color) -> Self {
-        const I0: u8 = 0x00;
-        const I0P5: u8 = 0x3f;
-        const I1: u8 = 0x7f;
-        const I1P5: u8 = 0xbf;
-        const I2: u8 = 0xff;
         match color {
-            Color::Black => (I0, I0, I0),
-            Color::DarkGrey => (I0P5, I0P5, I0P5),
-            Color::DarkRed => (I1, I0, I0),
-            Color::DarkYellow => (I1, I1, I0),
-            Color::DarkGreen => (I0, I1, I0),
-            Color::DarkCyan => (I0, I1, I1),
-            Color::DarkBlue => (I0, I0, I1),
-            Color::DarkMagenta => (I1, I0, I1),
-            Color::Grey => (I1P5, I1P5, I1P5),
-            Color::White => (I2, I2, I2),
-            Color::BrightRed => (I2, I0, I0),
-            Color::BrightYellow => (I2, I2, I0),
-            Color::BrightGreen => (I0, I2, I0),
-            Color::BrightCyan => (I0, I2, I2),
-            Color::BrightBlue => (I0, I0, I2),
-            Color::BrightMagenta => (I2, I0, I2),
+            Color::Black => (0x00, 0x00, 0x00),
+            Color::DarkGrey => (0x22, 0x22, 0x22),
+            Color::DarkRed => (0x55, 0x00, 0x00),
+            Color::DarkYellow => (0x55, 0x55, 0x00),
+            Color::DarkGreen => (0x00, 0x55, 0x00),
+            Color::DarkCyan => (0x00, 0x55, 0x55),
+            Color::DarkBlue => (0x00, 0x00, 0x55),
+            Color::DarkMagenta => (0x55, 0x00, 0x55),
+            Color::Grey => (0x55, 0x55, 0x55),
+            Color::White => (0xff, 0xff, 0xff),
+            Color::BrightRed => (0xff, 0xaa, 0xaa),
+            Color::BrightYellow => (0xff, 0xff, 0xaa),
+            Color::BrightGreen => (0xaa, 0xff, 0xaa),
+            Color::BrightCyan => (0xaa, 0xff, 0xff),
+            Color::BrightBlue => (0x55, 0xaa, 0xff),
+            Color::BrightMagenta => (0xff, 0xaa, 0xff),
         }
     }
 }
@@ -164,6 +159,21 @@ pub enum Span {
     Default,
 }
 
+impl Span {
+    pub fn contains(&self, position: usize) -> bool {
+        match self {
+            Span::StartLength {
+                start_position,
+                length,
+            } => {
+                let end_position = start_position + length;
+                position >= *start_position && position < end_position
+            }
+            Span::Default => true,
+        }
+    }
+}
+
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct TextFormatting {
     pub span: Span,
@@ -175,6 +185,22 @@ pub struct TextFormatting {
     pub strikethrough: bool,
     pub foreground_color: Color,
     pub background_color: Color,
+}
+
+impl Default for TextFormatting {
+    fn default() -> Self {
+        TextFormatting {
+            span: Span::Default,
+            alignment: Alignment::Left,
+            font_size: FontSize::Normal,
+            bold: false,
+            italic: false,
+            underline: false,
+            strikethrough: false,
+            foreground_color: Color::Black,
+            background_color: Color::White,
+        }
+    }
 }
 
 impl TextFormatting {
@@ -281,9 +307,32 @@ mod tests {
     #[test]
     fn color_rgb() {
         assert_eq!(RGB::from(Color::Black), (0x00, 0x00, 0x00));
-        assert_eq!(RGB::from(Color::DarkBlue), (0x00, 0x00, 0x7f));
         assert_eq!(RGB::from(Color::White), (0xff, 0xff, 0xff));
-        assert_eq!(RGB::from(Color::BrightBlue), (0x00, 0x00, 0xff));
+    }
+
+    #[test]
+    fn span_contains() {
+        let default = Span::Default;
+        assert!(default.contains(0));
+        assert!(default.contains(1));
+        assert!(default.contains(100));
+
+        let span = Span::StartLength {
+            start_position: 0,
+            length: 2,
+        };
+        assert!(span.contains(0));
+        assert!(span.contains(1));
+        assert!(!span.contains(2));
+
+        let span = Span::StartLength {
+            start_position: 1,
+            length: 2,
+        };
+        assert!(!span.contains(0));
+        assert!(span.contains(1));
+        assert!(span.contains(2));
+        assert!(!span.contains(3));
     }
 
     #[test]
