@@ -1,5 +1,5 @@
 #[derive(Debug, Copy, Clone, PartialEq)]
-enum Alignment {
+pub enum Alignment {
     Left,
     Center,
     Right,
@@ -30,7 +30,7 @@ impl From<Alignment> for u8 {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
-enum FontSize {
+pub enum FontSize {
     Normal,
     Large,
     Small,
@@ -59,7 +59,7 @@ impl From<FontSize> for u8 {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
-enum Color {
+pub enum Color {
     Black,
     DarkGrey,
     DarkRed,
@@ -97,7 +97,7 @@ impl From<u8> for Color {
             0b1101 => Color::BrightCyan,
             0b1110 => Color::BrightBlue,
             0b1111 => Color::BrightMagenta,
-            _ => panic!("color nibble out of range")
+            _ => panic!("color nibble out of range"),
         }
     }
 }
@@ -105,27 +105,27 @@ impl From<u8> for Color {
 impl From<Color> for u8 {
     fn from(color: Color) -> Self {
         match color {
-             Color::Black => 0b0000,
-             Color::DarkGrey => 0b0001,
-             Color::DarkRed => 0b0010,
-             Color::DarkYellow => 0b0011,
-             Color::DarkGreen => 0b0100,
-             Color::DarkCyan => 0b0101,
-             Color::DarkBlue => 0b0110,
-             Color::DarkMagenta => 0b0111,
-             Color::Grey => 0b1000,
-             Color::White => 0b1001,
-             Color::BrightRed => 0b1010,
-             Color::BrightYellow => 0b1011,
-             Color::BrightGreen => 0b1100,
-             Color::BrightCyan => 0b1101,
-             Color::BrightBlue => 0b1110,
-             Color::BrightMagenta => 0b1111,
+            Color::Black => 0b0000,
+            Color::DarkGrey => 0b0001,
+            Color::DarkRed => 0b0010,
+            Color::DarkYellow => 0b0011,
+            Color::DarkGreen => 0b0100,
+            Color::DarkCyan => 0b0101,
+            Color::DarkBlue => 0b0110,
+            Color::DarkMagenta => 0b0111,
+            Color::Grey => 0b1000,
+            Color::White => 0b1001,
+            Color::BrightRed => 0b1010,
+            Color::BrightYellow => 0b1011,
+            Color::BrightGreen => 0b1100,
+            Color::BrightCyan => 0b1101,
+            Color::BrightBlue => 0b1110,
+            Color::BrightMagenta => 0b1111,
         }
     }
 }
 
-type RGB = (u8, u8, u8);
+pub type RGB = (u8, u8, u8);
 
 impl From<Color> for RGB {
     fn from(color: Color) -> Self {
@@ -135,28 +135,28 @@ impl From<Color> for RGB {
         const I1P5: u8 = 0xbf;
         const I2: u8 = 0xff;
         match color {
-             Color::Black => (I0, I0, I0),
-             Color::DarkGrey => (I0P5, I0P5, I0P5),
-             Color::DarkRed => (I1, I0, I0),
-             Color::DarkYellow => (I1, I1, I0),
-             Color::DarkGreen => (I0, I1, I0),
-             Color::DarkCyan => (I0, I1, I1),
-             Color::DarkBlue => (I0, I0, I1),
-             Color::DarkMagenta => (I1, I0, I1),
-             Color::Grey => (I1P5, I1P5, I1P5),
-             Color::White => (I2, I2, I2),
-             Color::BrightRed => (I2, I0, I0),
-             Color::BrightYellow => (I2, I2, I0),
-             Color::BrightGreen => (I0, I2, I0),
-             Color::BrightCyan => (I0, I2, I2),
-             Color::BrightBlue => (I0, I0, I2),
-             Color::BrightMagenta => (I2, I0, I2),
+            Color::Black => (I0, I0, I0),
+            Color::DarkGrey => (I0P5, I0P5, I0P5),
+            Color::DarkRed => (I1, I0, I0),
+            Color::DarkYellow => (I1, I1, I0),
+            Color::DarkGreen => (I0, I1, I0),
+            Color::DarkCyan => (I0, I1, I1),
+            Color::DarkBlue => (I0, I0, I1),
+            Color::DarkMagenta => (I1, I0, I1),
+            Color::Grey => (I1P5, I1P5, I1P5),
+            Color::White => (I2, I2, I2),
+            Color::BrightRed => (I2, I0, I0),
+            Color::BrightYellow => (I2, I2, I0),
+            Color::BrightGreen => (I0, I2, I0),
+            Color::BrightCyan => (I0, I2, I2),
+            Color::BrightBlue => (I0, I0, I2),
+            Color::BrightMagenta => (I2, I0, I2),
         }
     }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
-enum Span {
+pub enum Span {
     StartLength {
         start_position: usize,
         length: usize,
@@ -165,20 +165,20 @@ enum Span {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
-struct TextFormatting {
-    span: Span,
-    alignment: Alignment,
-    font_size: FontSize,
-    bold: bool,
-    italic: bool,
-    underline: bool,
-    strikethrough: bool,
-    foreground_color: Color,
-    background_color: Color,
+pub struct TextFormatting {
+    pub span: Span,
+    pub alignment: Alignment,
+    pub font_size: FontSize,
+    pub bold: bool,
+    pub italic: bool,
+    pub underline: bool,
+    pub strikethrough: bool,
+    pub foreground_color: Color,
+    pub background_color: Color,
 }
 
 impl TextFormatting {
-    fn from_ied(ied: &[u8]) -> TextFormatting {
+    pub fn from_ied(ied: &[u8]) -> TextFormatting {
         let [start_position, length, mode, color] = match ied {
             [a, b, c, d] => [a, b, c, d],
             _ => panic!("ied must have length 4"),
@@ -187,20 +187,23 @@ impl TextFormatting {
         let span = if *start_position != 0 {
             let start_position = *start_position as usize;
             let length = *length as usize;
-            Span::StartLength { start_position, length }
+            Span::StartLength {
+                start_position,
+                length,
+            }
         } else {
             Span::Default
         };
 
-        let alignment = Alignment::from((mode >> 0) & 0b11);
+        let alignment = Alignment::from(mode & 0b11);
         let font_size = FontSize::from((mode >> 2) & 0b11);
         let bold = (mode >> 4) & 0b1 == 0b1;
         let italic = (mode >> 5) & 0b1 == 0b1;
         let underline = (mode >> 6) & 0b1 == 0b1;
         let strikethrough = (mode >> 7) & 0b1 == 0b1;
-        let foreground_color = Color::from((color >> 0) & 0b1111);
+        let foreground_color = Color::from(color & 0b1111);
         let background_color = Color::from((color >> 4) & 0b1111);
-        
+
         TextFormatting {
             span,
             alignment,
@@ -214,14 +217,17 @@ impl TextFormatting {
         }
     }
 
-    fn into_ied(&self) -> Vec<u8> {
+    pub fn to_ied(&self) -> Vec<u8> {
         let (start_position, length) = match self.span {
-            Span::StartLength { start_position, length } => (start_position as u8, length as u8),
+            Span::StartLength {
+                start_position,
+                length,
+            } => (start_position as u8, length as u8),
             Span::Default => (0, 0),
         };
 
         let mut mode = 0u8;
-        mode |= u8::from(self.alignment) << 0;
+        mode |= u8::from(self.alignment);
         mode |= u8::from(self.font_size) << 2;
         mode |= (self.bold as u8) << 4;
         mode |= (self.italic as u8) << 5;
@@ -232,10 +238,6 @@ impl TextFormatting {
 
         vec![start_position, length, mode, color]
     }
-}
-
-fn main() {
-    println!("Hello, world!");
 }
 
 #[cfg(test)]
@@ -303,7 +305,7 @@ mod tests {
         };
 
         assert_eq!(TextFormatting::from_ied(&ied), tf);
-        assert_eq!(tf.into_ied(), ied);
+        assert_eq!(tf.to_ied(), ied);
     }
 
     #[test]
@@ -322,7 +324,7 @@ mod tests {
         };
 
         assert_eq!(TextFormatting::from_ied(&ied), tf);
-        assert_eq!(tf.into_ied(), ied);
+        assert_eq!(tf.to_ied(), ied);
     }
 
     #[test]
@@ -344,6 +346,6 @@ mod tests {
         };
 
         assert_eq!(TextFormatting::from_ied(&ied), tf);
-        assert_eq!(tf.into_ied(), ied);
+        assert_eq!(tf.to_ied(), ied);
     }
 }
